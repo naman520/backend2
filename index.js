@@ -10,22 +10,23 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Proxy route: /namantest -> https://bb.online/namanTest/dashboard.php
 app.use('/namantest', createProxyMiddleware({
-  target: 'https://bigbucket.online',
+  target: 'https://bigbucket.online', // ← real PHP domain here
   changeOrigin: true,
   secure: false,
-  pathRewrite: {
-    '^/namantest': '/namanTest/dashboard.php', // Rewrites local /namantest to remote /namanTest/dashboard.php
+  headers: {
+    'User-Agent': 'Mozilla/5.0',
+    'Referer': 'https://bigbucket.online',
   },
-  cookieDomainRewrite: '', // remove domain from set-cookie headers
+  pathRewrite: {
+    '^/namantest': '/namanTest/dashboard.php', // or any real path
+  },
+  cookieDomainRewrite: '', // strips domain so cookies apply to proxy
   onProxyRes(proxyRes) {
     const cookies = proxyRes.headers['set-cookie'];
     if (cookies) {
       proxyRes.headers['set-cookie'] = cookies.map(cookie =>
-        cookie
-          .replace(/Domain=\.?bigbucket\.online/i, '') // Remove domain
-          .replace(/; secure/gi, '') // Allow for HTTP and proxies
+        cookie.replace(/Domain=\.?bigbucket\.online/i, '').replace(/; secure/gi, '')
       );
     }
   },
@@ -33,5 +34,5 @@ app.use('/namantest', createProxyMiddleware({
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Proxy server running at http://localhost:${PORT}`);
+  console.log(`✅ Proxy listening on port ${PORT}`);
 });
