@@ -10,20 +10,22 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Proxy route
+// Proxy route: /namantest -> https://bb.online/namanTest/dashboard.php
 app.use('/namantest', createProxyMiddleware({
-  target: 'https://bigbucket.online/namanTest',
+  target: 'https://bigbucket.online',
   changeOrigin: true,
   secure: false,
-  cookieDomainRewrite: 'https://bma-dholera-sir.onrender.com', // Rewrite to current domain
-  pathRewrite: { '^/namantest': '/dashboard.php' },
+  pathRewrite: {
+    '^/namantest': '/namanTest/dashboard.php', // Rewrites local /namantest to remote /namanTest/dashboard.php
+  },
+  cookieDomainRewrite: '', // remove domain from set-cookie headers
   onProxyRes(proxyRes) {
     const cookies = proxyRes.headers['set-cookie'];
     if (cookies) {
       proxyRes.headers['set-cookie'] = cookies.map(cookie =>
         cookie
-          .replace(/Domain=\.?bigbucket\.online\namanTest/i, '') // remove Domain attribute
-          .replace(/; secure/gi, '') // allow on HTTP too
+          .replace(/Domain=\.?bigbucket\.online/i, '') // Remove domain
+          .replace(/; secure/gi, '') // Allow for HTTP and proxies
       );
     }
   },
@@ -31,5 +33,5 @@ app.use('/namantest', createProxyMiddleware({
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Proxy server listening on port ${PORT}`);
+  console.log(`✅ Proxy server running at http://localhost:${PORT}`);
 });
