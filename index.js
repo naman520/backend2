@@ -15,7 +15,7 @@ app.use('/namantest', createProxyMiddleware({
   target: 'https://bigbucket.online/namanTest',
   changeOrigin: true,
   secure: false,
-  cookieDomainRewrite: '', // Rewrite to current domain
+  cookieDomainRewrite: 'https://bma-dholera-sir.onrender.com', // Rewrite to current domain
   pathRewrite: { '^/namantest': '/dashboard.php' },
   onProxyRes(proxyRes) {
     const cookies = proxyRes.headers['set-cookie'];
