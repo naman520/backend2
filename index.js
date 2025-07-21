@@ -11,12 +11,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/namantest', createProxyMiddleware({
-  target: 'https://bigbucket.online', // ← real PHP domain here
+  target: 'https://bigbucket.online/namanTest', // ← real PHP domain here
   changeOrigin: true,
   secure: false,
   headers: {
     'User-Agent': 'Mozilla/5.0',
-    'Referer': 'https://bigbucket.online',
+    'Referer': 'https://bigbucket.online/namanTest',
   },
   pathRewrite: {
     '^/namantest': '/namanTest/dashboard.php', // or any real path
